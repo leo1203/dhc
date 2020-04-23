@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>测评结果</title>
+    <!--引入bootstrap样式-->
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <!--引入element样式-->
+    <link rel="stylesheet" href="css/element-ui-2.9.1.css">
+    <!--引入自己扩展样式-->
+    <link rel="stylesheet" type="text/css" href="css/common-list.css">
+    <!--引入vue-->
+    <script src="js/vue.js"></script>
+    <!--引入自己扩展js-->
+    <script src="js/element-ui-2.9.1.js"></script>
+    <script src="js/axios.js"></script>
+    <script src="js/list.js"></script>
+    <script src="js/xlsx.full.min.js"></script>
+    <script src="js/Blob.js"></script>
+    <script src="js/FileSaver.js"></script>
+    <script src="js/jQuery-3.4.1.js"></script>
+    <script src="js/jQuery.print.min.js"></script>
+    <style type="text/css">
+        @media print {
+        }
+    </style>
+</head>
+<body>
+<el-container id="score" v-cloak>
+    <el-header>
+        <!--        <div style="position: relative;">-->
+        <el-date-picker
+                style="width: 30%"
+                v-model="value2"
+                type="daterange"
+                range-separator="至"
+                value-format="yyyy-MM-dd"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期">
+        </el-date-picker>
+        <el-button type="success" @click="getResultByTime()">查询</el-button>
+        <!--        <el-button type="success" plain icon="el-icon-download" style="float: right"-->
+        <!--                   @click="download()"></el-button>-->
+        <!--        </div>-->
+    </el-header>
+    <el-main>
+        <div style="margin: 0 auto">
+            <el-table
+                    id="outTable"
+                    :data="tableData"
+                    border
+                    style="width: 100%"
+                    :row-class-name="tableRowClassName">
+                <el-table-column type="expand">
+                    <template slot-scope="props">
+                        <el-form label-position="left" inline class="demo-table-expand">
+                            <el-form-item label="答案">
+                                <span v-for="(item,key,index) in props.row.answersMap">
+                                    {{ key }}&nbsp;--&nbsp;{{item | numberFormat}}&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+                            </el-form-item>
+                        </el-form>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="name"
+                        label="姓名"
+                        align="center"
+                        width="80">
+                </el-table-column>
+                <el-table-column
+                        prop="tel"
+                        label="电话"
+                        align="center"
+                        width="120">
+                </el-table-column>
+                <el-table-column
+                        prop="age"
+                        width="60"
+                        align="center"
+                        label="年龄">
+                </el-table-column>
+                <el-table-column
+                        prop="gender"
+                        width="60"
+                        align="center"
+                        label="性别">
+                </el-table-column>
+
+<!--                <el-table-column>-->
+<!--                <template slot-scope="scope">-->
+<!--                    <el-row v-for="(ans,key,index) in JSON.parse(scope.row.dimensionAnswer)">-->
+<!--                        {{ans}}-->
+<!--                    </el-row>-->
+<!--                </template>-->
+<!--                </el-table-column>-->
+
+                <el-table-column
+                        prop= "asource"
+                        align="center"
+                        width="110"
+                        label="F1躯体化"
+                        :render-header="renderHeader">
+                    <template slot-scope="scope">
+                        <div :style="getAcolor(scope.row.asource)"><span style="font-size:16px">{{ scope.row.asource }}</span></div>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="bsource"
+                        align="center"
+                        width="110"
+                        label="F2强迫"
+                        :render-header="renderHeader">
+                    <template slot-scope="scope">
+                        <div :style="getBcolor(scope.row.bsource)"><span style="font-size:16px">{{ scope.row.bsource }}</span></div>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="csource"
+                        width="110"
+                        align="center"
+                        label="F3人际敏感"
+                        :render-header="renderHeader">
+                    <template slot-scope="scope">
+                        <div :style="getCcolor(scope.row.csource)"><span style="font-size:16px">{{ scope.row.csource }}</span></div>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="dsource"
+                        width="110"
+                        align="center"
+                        label="F4抑郁"
+                        :render-header="renderHeader">
+                    <template slot-scope="scope">
+                        <div :style="getDcolor(scope.row.dsource)"><span style="font-size:16px">{{ scope.row.dsource }}</span></div>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="esource"
+                        width="110"
+                        align="center"
+                        label="F5焦虑"
+                        :render-header="renderHeader">
+                    <template slot-scope="scope">
+                        <div :style="getEcolor(scope.row.esource)"><span style="font-size:16px">{{ scope.row.esource }}</span></div>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="fsource"
+                        width="110"
+                        align="center"
+                        label="F6敌意"
+                        :render-header="renderHeader">
+                    <template slot-scope="scope">
+                        <div :style="getFcolor(scope.row.fsource)"><span style="font-size:16px">{{ scope.row.fsource }}</span></div>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="gsource"
+                        width="110"
+                        align="center"
+                        label="F7恐怖"
+                        :render-header="renderHeader">
+                    <template slot-scope="scope">
+                        <div :style="getGcolor(scope.row.gsource)"><span style="font-size:16px">{{ scope.row.gsource }}</span></div>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="hsource"
+                        width="110"
+                        align="center"
+                        label="F8偏执"
+                        :render-header="renderHeader">
+                    <template slot-scope="scope">
+                        <div :style="getHcolor(scope.row.hsource)"><span style="font-size:16px">{{ scope.row.hsource }}</span></div>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="isource"
+                        width="110"
+                        align="center"
+                        label="F9精神病性"
+                        :render-header="renderHeader">
+                    <template slot-scope="scope">
+                        <div :style="getIcolor(scope.row.isource)"><span style="font-size:16px">{{ scope.row.isource }}</span></div>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="jsource"
+                        width="110"
+                        align="center"
+                        label="F10附加因子"
+                        :render-header="renderHeader">
+                    <template slot-scope="scope">
+                        <div :style="getJcolor(scope.row.jsource)"><span style="font-size:16px">{{ scope.row.jsource }}</span></div>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="average"
+                        width="110"
+                        align="center"
+                        label="总症状指数"
+                        :render-header="renderHeader">
+                    <template slot-scope="scope">
+                        <div :style="getAVcolor(scope.row.average)"><span style="font-size:16px">{{ scope.row.average }}</span></div>
+                    </template>
+                </el-table-column>
+
+                <el-table-column
+                        prop="create_time"
+                        align="center"
+                        label="提交时间"
+                        width="150">
+                </el-table-column>
+                　
+                <el-table-column label="操作" align="center"  width="80">
+                    <template slot-scope="scope">
+                        <!--                        <el-button type="primary"-->
+                        <!--                                   @click="exportInfo(scope.row.answersMap,scope.row.name,scope.row.tel)">导出-->
+                        <!--                        </el-button>-->
+                        <el-button type="primary"
+                                   @click="detailsInfo(scope.row.answersMap,scope.row.name,scope.row.tel)">详情
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination background layout="prev, pager, next"
+                           :total="totalPage"
+                           :page-size="pageSize"
+                           @size-change="handleSizeChange"
+                           @current-change="handleCurrentChange"
+                           :current-page.sync="currentPage"
+                           align="right"
+                           style="margin-top: 20px">
+            </el-pagination>
+        </div>
+    </el-main>
+    <el-dialog title="详细信息" :visible.sync="dialogTableVisible" width="70%">
+        <div style="float: right;height: 40px">
+            <el-button type="info" icon="el-icon-printer"
+                       @click="printInfo()">打印
+            </el-button>
+            <el-button type="warning" icon="el-icon-download" style="margin-right: 10px"
+                       @click="exportDetailsInfo()">导出
+            </el-button>
+        </div>
+        <div id="printInfo">
+            <span style="text-align: center;font-weight: bold;font-size: 22px;">{{detailsName}}-{{detailsTel}}</span>
+            <el-table :data="gridData" class="details-info">
+                <el-table-column property="id" label="编号" width="100" align="center"></el-table-column>
+                <el-table-column property="question" label="题目" width="400"></el-table-column>
+                <el-table-column property="answer" label="选择的答案" align="center"></el-table-column>
+            </el-table>
+        </div>
+    </el-dialog>
+</el-container>
+
+</body>
+
+</html>

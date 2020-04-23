@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8"/>
+        <title>MeetingAreaOrder</title>
+    </head>
+    <body>
+        您好：<br/>
+	    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span th:text="${meetingAreaOrder.contactName}"></span>（<span th:text="${meetingAreaOrder.contactPhone}"></span>）<br/>
+	    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;预定地点：<span th:text="${areaAddress}"></span><br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;使用日期：<span th:text="${meetingAreaOrder.reserveDate}"></span><br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;使用时间：<span th:text="${meetingAreaOrder.reserveStartTime}"></span>--<span th:text="${meetingAreaOrder.reserveEndTime}"></span><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;请准时参加会议！
+    </body>
+</html>

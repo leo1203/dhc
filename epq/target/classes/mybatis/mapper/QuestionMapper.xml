@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.com.dhc.epq.mapper.QuestionMapper" >
+    
+	<resultMap id="Question" type="cn.com.dhc.epq.bean.Question" >
+        <id column="no" property="no" />
+        <result column="question" property="question"/>
+        <result column="answer" property="answer"/>
+        <result column="type" property="type"/>
+    </resultMap>
+
+
+	<select id="getQuestion" resultType="java.util.HashMap">
+       SELECT 
+		  q.`no` no,
+		  q.`question` content
+	   FROM
+		  question q
+    </select>
+    
+    <insert id="addQuestion" parameterType="cn.com.dhc.epq.bean.Question" >
+       INSERT INTO question
+        (
+		  `question`,
+		  `answer`,
+		  `type`
+		) 
+		VALUES
+		  (
+		    #{question},
+		    #{answer},
+		    #{type}
+		  ) 
+    </insert>
+
+    <select id="getAnswerMapByType" parameterType="java.lang.String" resultType="java.util.HashMap">
+       SELECT 
+		  q.`no` no,
+		  q.`type` type
+	   FROM
+		  question q 
+	   WHERE q.`type` = #{type}
+    </select>
+</mapper>
